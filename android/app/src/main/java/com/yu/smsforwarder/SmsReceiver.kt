@@ -6,9 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.provider.Telephony
 import android.telephony.SubscriptionManager
-import org.json.JSONObject
-import java.net.HttpURLConnection
-import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -16,21 +13,25 @@ import java.util.Locale
 class SmsReceiver : BroadcastReceiver() {
   override fun onReceive(ctx: Context, intent: Intent) {
     if (intent.action != Telephony.Sms.Intents.SMS_RECEIVED_ACTION) return
+    if (!Prefs.ready(ctx)) return
     val msgs = Telephony.Sms.Intents.getMessagesFromIntent(intent) ?: return
     if (msgs.isEmpty()) return
     val sender = msgs[0].originatingAddress ?: "-"
-    val body = msgs.joinToString("") { it.messageBody ?: "" }
+    val body = msgs.joinToString("") { it.messageBody ?: "" }.take(4000)
     if (!Prefs.KEYWORDS.containsMatchIn(body)) return
+    val receivedAt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US).format(Date(msgs[0].timestampMillis))
+    val identity = "$sender\u0000$body\u0000$receivedAt"
+    if (Prefs.alreadyForwarded(ctx, identity)) return
 
     val (sim, phone) = simInfo(ctx, intent)
-    val json = JSONObject()
-      .put("device", Prefs.device(ctx))
-      .put("sim", sim)
-      .put("sender", sender)
-      .put("content", body)
-      .put("receivedAt", SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US).format(Date(msgs[0].timestampMillis)))
-    if (!phone.isNullOrBlank()) json.put("phone", phone)
-
+    val note = SmsNote(
+      device = Prefs.device(ctx),
+      phone = phone,
+      sim = sim,
+      sender = sender,
+      content = body,
+      receivedAt = receivedAt,
+    )
     try {
       KeepAliveService.start(ctx)
     } catch (_: Exception) {
@@ -38,7 +39,10 @@ class SmsReceiver : BroadcastReceiver() {
     val pending = goAsync()
     Thread {
       try {
-        post(ctx, json)
+        val result = Push.send(Prefs.webhook(ctx), Prefs.mail(ctx), note)
+        if (result.delivered(Prefs.webhook(ctx).isNotBlank(), Prefs.emailReady(ctx))) {
+          Prefs.markForwarded(ctx, identity)
+        }
       } catch (_: Exception) {
       } finally {
         pending.finish()
@@ -47,32 +51,17 @@ class SmsReceiver : BroadcastReceiver() {
   }
 
   companion object {
-    fun post(ctx: Context, json: JSONObject): Int {
-      val endpoint = Prefs.url(ctx).trim()
-      if (endpoint.isBlank()) return -1
-      val target = endpoint.trimEnd('/') + "/api/report"
-      var last = -2
-      repeat(3) { attempt ->
-        try {
-          val connection = URL(target).openConnection() as HttpURLConnection
-          connection.requestMethod = "POST"
-          connection.doOutput = true
-          connection.connectTimeout = 5000
-          connection.readTimeout = 5000
-          connection.instanceFollowRedirects = false
-          connection.setRequestProperty("Content-Type", "application/json; charset=utf-8")
-          connection.setRequestProperty("x-api-token", Prefs.token(ctx))
-          connection.setRequestProperty("User-Agent", "SmsForwarder/1.0")
-          connection.outputStream.use { it.write(json.toString().toByteArray(Charsets.UTF_8)) }
-          last = connection.responseCode
-          connection.disconnect()
-          if (last in 200..299 || last in 400..499) return last
-        } catch (_: Exception) {
-          last = -2
-        }
-        if (attempt < 2) Thread.sleep(1000L * (attempt + 1))
-      }
-      return last
+    fun sendTest(ctx: Context): PushResult {
+      val stamp = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US).format(Date())
+      val note = SmsNote(
+        device = Prefs.device(ctx),
+        phone = null,
+        sim = "test",
+        sender = "test",
+        content = "【测试】您的验证码是 123456",
+        receivedAt = stamp,
+      )
+      return Push.send(Prefs.webhook(ctx), Prefs.mail(ctx), note)
     }
   }
 }

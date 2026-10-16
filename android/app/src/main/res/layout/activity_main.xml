@@ -1,46 +1,87 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:orientation="vertical"
-  android:padding="16dp"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
-  <EditText
-    android:id="@+id/url"
-    android:hint="服务器地址，如 https://xxx.vercel.app"
-    android:inputType="textUri"
-    android:singleLine="true"
+  <LinearLayout
+    android:orientation="vertical"
+    android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
-  <EditText
-    android:id="@+id/token"
-    android:hint="API_TOKEN（至少 16 位）"
-    android:inputType="textPassword"
-    android:singleLine="true"
-    android:layout_marginTop="12dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
-  <EditText
-    android:id="@+id/device"
-    android:hint="设备名称"
-    android:singleLine="true"
-    android:layout_marginTop="12dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
-  <Button
-    android:id="@+id/save"
-    android:text="保存并启动"
-    android:layout_marginTop="12dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
-  <Button
-    android:id="@+id/test"
-    android:text="发送测试"
-    android:layout_marginTop="8dp"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"/>
-  <TextView
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginTop="16dp"
-    android:textSize="13sp"
-    android:text="只转发含验证码关键词的短信。公网请使用 HTTPS。国产手机请允许自启动，并把电池设为无限制。"/>
-</LinearLayout>
+    android:layout_height="wrap_content">
+    <EditText
+      android:id="@+id/webhook"
+      android:hint="企业微信群机器人 Webhook"
+      android:inputType="textUri"
+      android:singleLine="true"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+    <EditText
+      android:id="@+id/device"
+      android:hint="设备名称"
+      android:singleLine="true"
+      android:layout_marginTop="12dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="16dp"
+      android:text="邮箱可以留空。要发邮件时再填下面几项。"
+      android:textSize="13sp"/>
+    <EditText
+      android:id="@+id/smtpHost"
+      android:hint="SMTP 服务器，如 smtp.qq.com"
+      android:singleLine="true"
+      android:layout_marginTop="8dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+    <EditText
+      android:id="@+id/smtpPort"
+      android:hint="端口，QQ/163 一般是 465"
+      android:inputType="number"
+      android:singleLine="true"
+      android:layout_marginTop="12dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+    <EditText
+      android:id="@+id/smtpUser"
+      android:hint="发件邮箱"
+      android:inputType="textEmailAddress"
+      android:singleLine="true"
+      android:layout_marginTop="12dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+    <EditText
+      android:id="@+id/smtpPass"
+      android:hint="SMTP 授权码，不是登录密码"
+      android:inputType="textPassword"
+      android:singleLine="true"
+      android:layout_marginTop="12dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+    <EditText
+      android:id="@+id/mailTo"
+      android:hint="收件邮箱"
+      android:inputType="textEmailAddress"
+      android:singleLine="true"
+      android:layout_marginTop="12dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+    <Button
+      android:id="@+id/save"
+      android:text="保存并启动"
+      android:layout_marginTop="12dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+    <Button
+      android:id="@+id/test"
+      android:text="发送测试"
+      android:layout_marginTop="8dp"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"/>
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="16dp"
+      android:textSize="13sp"
+      android:text="验证码会从手机直接发到企业微信或邮箱。只转发含验证码关键词的短信。国产手机请允许自启动，并把电池设为无限制。"/>
+  </LinearLayout>
+</ScrollView>
