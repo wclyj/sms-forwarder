@@ -1,0 +1,23 @@
+{
+  "name": "sms-forwarder-server",
+  "private": true,
+  "description": "Receive SMS verification codes and push them to WeCom and email",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "next": "^14.2.35",
+    "nodemailer": "^10.1.1",
+    "react": "18.3.1",
+    "react-dom": "18.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.3"
+  }
+}
