@@ -75,8 +75,26 @@ object Prefs {
     return bytes.joinToString("") { "%02x".format(it) }
   }
 
+  fun lastSms(context: Context) = prefs(context).getString("lastSms", "还没有")!!
+
+  fun lastForward(context: Context) = prefs(context).getString("lastForward", "还没有")!!
+
+  fun setLastSms(context: Context, value: String) {
+    prefs(context).edit().putString("lastSms", value.take(80)).apply()
+  }
+
+  fun setLastForward(context: Context, value: String) {
+    prefs(context).edit().putString("lastForward", value.take(120)).apply()
+  }
+
+  fun askedBattery(context: Context) = prefs(context).getBoolean("askedBattery", false)
+
+  fun markAskedBattery(context: Context) {
+    prefs(context).edit().putBoolean("askedBattery", true).apply()
+  }
+
   val KEYWORDS = Regex(
-    "验证码|校验码|动态码|确认码|激活码|驗證碼|verification|(?<![A-Za-z])(?:code|otp|pin)(?![A-Za-z])",
+    "验证码|校验码|动态码|动态密码|确认码|激活码|验证代码|一次性密码|登录码|安全码|短信口令|口令|驗證碼|verification|passcode|(?<![A-Za-z])(?:code|otp|pin)(?![A-Za-z])",
     RegexOption.IGNORE_CASE,
   )
 }

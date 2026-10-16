@@ -36,6 +36,9 @@ data class PushResult(val wecom: String, val email: String) {
 }
 
 object Push {
+  private val smtpLock = Any()
+  @Volatile private var smtpBlockedUntil = 0L
+
   fun send(webhook: String, mail: MailSettings?, note: SmsNote): PushResult {
     val wecom = if (webhook.isBlank()) "skipped" else pushWecom(webhook, note)
     val email = if (mail == null) "skipped" else pushEmail(mail, note)
@@ -50,17 +53,31 @@ object Push {
   }
 
   private fun pushEmail(mail: MailSettings, note: SmsNote): String {
-    var last = "error"
-    repeat(3) { attempt ->
-      try {
-        sendSmtp(mail, note)
-        return "ok"
-      } catch (error: Exception) {
-        last = "error: ${error.message ?: "smtp"}".take(180)
-        if (attempt < 2) Thread.sleep(1000L * (attempt + 1))
+    val now = System.currentTimeMillis()
+    if (now < smtpBlockedUntil) return "error: 邮箱登录被限制，请过一会儿再试一次"
+    synchronized(smtpLock) {
+      if (System.currentTimeMillis() < smtpBlockedUntil) return "error: 邮箱登录被限制，请过一会儿再试一次"
+      var last = "error"
+      repeat(3) { attempt ->
+        try {
+          sendSmtp(mail, note)
+          return "ok"
+        } catch (error: Exception) {
+          last = "error: ${error.message ?: "smtp"}".take(180)
+          if (isLoginRejected(error)) {
+            smtpBlockedUntil = System.currentTimeMillis() + 20 * 60 * 1000L
+            return last
+          }
+          if (attempt < 2) Thread.sleep(1000L * (attempt + 1))
+        }
       }
+      return last
     }
-    return last
+  }
+
+  private fun isLoginRejected(error: Exception): Boolean {
+    val message = error.message ?: return false
+    return message.contains("535") || message.contains("Login fail", ignoreCase = true)
   }
 
   private fun markdown(note: SmsNote): String {

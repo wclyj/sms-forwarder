@@ -1,5 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
   <uses-permission android:name="android.permission.RECEIVE_SMS"/>
+  <uses-permission android:name="android.permission.READ_SMS"/>
+  <uses-permission android:name="android.permission.WAKE_LOCK"/>
+  <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
   <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
   <uses-permission android:name="android.permission.READ_PHONE_NUMBERS"/>
   <uses-permission android:name="android.permission.INTERNET"/>
@@ -8,11 +11,11 @@
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
   <application
-    android:label="验证码转发"
+    android:label="码到"
     android:allowBackup="false"
     android:usesCleartextTraffic="true"
     android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
-    <activity android:name=".MainActivity" android:exported="true">
+    <activity android:name=".MainActivity" android:exported="true" android:label="码到">
       <intent-filter>
         <action android:name="android.intent.action.MAIN"/>
         <category android:name="android.intent.category.LAUNCHER"/>

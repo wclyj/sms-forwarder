@@ -78,10 +78,31 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"/>
     <TextView
+      android:id="@+id/watch"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginTop="16dp"
       android:textSize="13sp"
-      android:text="验证码会从手机直接发到企业微信或邮箱。只转发含验证码关键词的短信。国产手机请允许自启动，并把电池设为无限制。"/>
+      android:text="短信权限：检查中"/>
+    <TextView
+      android:id="@+id/lastSms"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="8dp"
+      android:textSize="13sp"
+      android:text="最近短信：还没有"/>
+    <TextView
+      android:id="@+id/lastForward"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="8dp"
+      android:textSize="13sp"
+      android:text="最近转发：还没有"/>
+    <TextView
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="16dp"
+      android:textSize="13sp"
+      android:text="测试成功只说明邮箱通了。带验证码字样的短信会转发；只有一串4到8位数字的短短信也会转发。请允许短信权限，并把电池设为无限制。"/>
   </LinearLayout>
 </ScrollView>
